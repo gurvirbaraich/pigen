@@ -18,6 +18,24 @@ class ListCommand extends Command
     "POST"
   ];
 
+  protected $description = "List all registered routes";
+
+  protected $colors = [
+    'ANY' => 'red',
+    'GET' => 'blue',
+    'HEAD' => '#6C7280',
+    'OPTIONS' => '#6C7280',
+    'POST' => 'yellow',
+    'PUT' => 'yellow',
+    'PATCH' => 'yellow',
+    'DELETE' => 'red',
+  ];
+
+  protected function configure()
+  {
+    $this->setDescription($this->description);
+  }
+
   protected function execute(InputInterface $input, OutputInterface $output): int
   {
     // Load all the registered routes.
@@ -39,7 +57,7 @@ class ListCommand extends Command
     foreach ($routes as $route) {
       $output->writeln(
         sprintf(
-          "%s %s %s %s",
+          "%s %s <fg=" . $this->colors["HEAD"] . ">%s %s</>",
 
           $route['method'],
           $route['path'],
@@ -68,7 +86,7 @@ class ListCommand extends Command
           $m = $method . str_repeat(' ', mb_strlen('       ') - strlen($method));
 
           $routes[] = [
-            'method' =>  !($width = $terminalWidth - mb_strlen($m)) ?: $m,
+            'method' =>  !($width = $terminalWidth - mb_strlen($m)) ?: "<fg=" . $this->colors[$method] . ";options=bold>$m</>",
             'path' => $key,
             'caller' => !($width = $width - 2 - mb_strlen($caller)) ?: $caller,
             'dots' => $width - mb_strlen($key . " \t")
