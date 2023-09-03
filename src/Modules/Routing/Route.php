@@ -9,7 +9,7 @@ class Route
    * 
    * @var array 
    */
-  private static array $paths = array();
+  public static array $paths = array();
 
   /**
    * Indicates the route that needs to be processed.
@@ -18,9 +18,10 @@ class Route
    */
   private array $pathAttributes;
 
-  public function __construct(array $pathAttributes)
+  public function __construct(array $pathAttributes = [])
   {
-    $this->pathAttributes = $pathAttributes;
+    if (count($pathAttributes) == 2)
+      $this->pathAttributes = $pathAttributes;
   }
 
   public function __destruct()

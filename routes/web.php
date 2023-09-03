@@ -16,3 +16,7 @@ use Pigen\Modules\ViewEngine\View;
 */
 
 Route::GET("/", [HomeController::class, 'index']);
+Route::GET("/profile/:id", [HomeController::class, 'profile']);
+Route::GET("/subscriptions/:id", [HomeController::class, 'subscribe']);
+
+Route::POST("/account/login", [HomeController::class, 'login']);

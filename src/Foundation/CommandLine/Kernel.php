@@ -4,13 +4,15 @@ namespace Pigen\Foundation\CommandLine;
 
 use \Symfony\Component\Console\Application;
 use Pigen\Foundation\CommandLine\Commands\InsultCommand;
+use Pigen\Foundation\CommandLine\Commands\Routes\ListCommand;
 
 class Kernel
 {
   private static $application;
 
   private static array $commands = [
-    InsultCommand::class
+    ListCommand::class,
+    InsultCommand::class,
   ];
 
   public function __construct()

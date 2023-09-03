@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use Pigen\Foundation\CommandLine\Kernel;
+
 /*
  | --------------------------------------------------------------------
  | Register The Auto Loader
@@ -12,9 +14,21 @@
  |
  */
 
-use Pigen\Foundation\CommandLine\Kernel;
 
 require __DIR__ . '/vendor/autoload.php';
+
+/*
+ | ----------------------------------------------------------------
+ | Define Global Constants
+ | ----------------------------------------------------------------
+ | 
+ | These constants are used throughout the application. They are
+ | defined here so that we don't have to repeat them throughout
+ | the application.
+ |
+ */
+
+define("ABSPATH", __DIR__);
 
 /*
  | -------------------------------------------------------------------- 
