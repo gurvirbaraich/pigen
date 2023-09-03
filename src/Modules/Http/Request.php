@@ -16,6 +16,8 @@ class Request
    */
   private array $parameters = [];
 
+  private array $properties = [];
+
   /**
    * Automatically loads the request parameters based on the 
    * HTTP request method (GET or POST)
@@ -26,6 +28,16 @@ class Request
       'GET' => $this->load($_GET),
       'POST' => $this->load($_POST),
     };
+
+    $this->populateProperties();
+  }
+
+  private function populateProperties()
+  {
+    $this->properties = [
+      'method' => $_SERVER['REQUEST_METHOD'],
+      'path' => preg_replace('/(\/.*)\?.*/m', "$1", $_SERVER['REQUEST_URI']),
+    ];
   }
 
   /**
@@ -49,6 +61,24 @@ class Request
    */
   public function __get($name)
   {
-    return $this->parameters[$name];
+    return $this->parameters[$name] ?? $this->properties[$name];
+  }
+
+  /**
+   * Magic method to update the value of request parameters
+   *
+   * @return void
+   */
+  public function __set(string $name, $value): void
+  {
+    $this->parameters[$name] = $value;
+  }
+
+  /**
+   * Creates a new instance of the Request object
+   */
+  public static function capture()
+  {
+    return new self();
   }
 }

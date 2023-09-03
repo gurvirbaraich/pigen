@@ -5,6 +5,7 @@
  * @license MIT
  */
 
+use Pigen\Modules\Http\Request;
 use Pigen\Modules\Routing\Route;
 
 /*
@@ -16,9 +17,22 @@ use Pigen\Modules\Routing\Route;
  | We'll simply need to require it into the script so we don't need to
  | worry about manual loading any of our classes later on.
  |
-*/
+ */
 
 require __DIR__ . '/vendor/autoload.php';
+
+/*
+ | ----------------------------------------------------------------
+ | Define Global Constants
+ | ----------------------------------------------------------------
+ | 
+ | These constants are used throughout the application. They are
+ | defined here so that we don't have to repeat them throughout
+ | the application.
+ |
+ */
+
+define("ABSPATH", __DIR__);
 
 /*
  | --------------------------------------------------------------------
@@ -29,11 +43,11 @@ require __DIR__ . '/vendor/autoload.php';
  | HTTP the requests. Finally, the application will send the response
  | back to the client's browser.
  |
-*/
+ */
 
-$app = require __DIR__ . '/src/Foundation/Application.php';
+$app = require ABSPATH . '/src/Foundation/Application.php';
 
 
 $app
   ->workers['http']
-  ->handle();
+  ->handle(Request::capture());

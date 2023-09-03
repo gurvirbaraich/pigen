@@ -12,6 +12,31 @@ class Route
   private static array $paths = array();
 
   /**
+   * Indicates the route that needs to be processed.
+   *
+   * @var array
+   */
+  private array $pathAttributes;
+
+  public function __construct(array $pathAttributes)
+  {
+    $this->pathAttributes = $pathAttributes;
+  }
+
+  public function __destruct()
+  {
+    if (
+      isset(
+        self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']]
+      )
+    ) {
+      echo "Found registered route for " . $this->pathAttributes['path'] . " with method " . $this->pathAttributes['method'];
+    } else {
+      echo '404. Not found';
+    }
+  }
+
+  /**
    * Define a GET route.
    *
    * @param string $path The path for the route.
@@ -94,5 +119,13 @@ class Route
   private static function append(string $method, string $path, array $handlers)
   {
     self::$paths[$method][$path] = $handlers;
+  }
+
+  /**
+   * Create a new instance of the Route class.
+   */
+  public static function ignite(array $pathAttributes)
+  {
+    new self($pathAttributes);
   }
 }
