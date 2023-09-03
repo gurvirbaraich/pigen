@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ | --------------------------------------------------------------------
+ | Register The Auto Loader
+ | --------------------------------------------------------------------
+ |
+ | Composer provides a convenient, automatically generated class loader
+ | We'll simply need to require it into the script so we don't need to
+ | worry about manual loading any of our classes later on.
+ |
+ */
+
+use Pigen\Foundation\CommandLine\Kernel;
+
+require __DIR__ . '/vendor/autoload.php';
+
+/*
+ | -------------------------------------------------------------------- 
+ | Running Pigen CLI
+ | --------------------------------------------------------------------
+ |
+ | The command will be handle by the Pigen Command Line Kernel and the 
+ | response will be sent back to the console.
+ */
+Kernel::handle();

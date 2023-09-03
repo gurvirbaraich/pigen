@@ -6,7 +6,6 @@
  */
 
 use Pigen\Modules\Http\Request;
-use Pigen\Modules\Routing\Route;
 
 /*
  | --------------------------------------------------------------------
