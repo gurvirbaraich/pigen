@@ -1,6 +1,7 @@
 <?php
 
 use Pigen\Modules\Routing\Route;
+use Pigen\Modules\ViewEngine\View;
 
 /* 
  | ----------------------------------------------------------------
@@ -12,6 +13,5 @@ use Pigen\Modules\Routing\Route;
  | 'web' middlewar group.
  | 
 */
-
 
 Route::GET("/", ["abc"]);
