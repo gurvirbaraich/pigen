@@ -5,6 +5,7 @@ namespace Pigen\Foundation\CommandLine;
 use \Symfony\Component\Console\Application;
 use Pigen\Foundation\CommandLine\Commands\InsultCommand;
 use Pigen\Foundation\CommandLine\Commands\Routes\ListCommand;
+use Pigen\Foundation\CommandLine\Commands\ServeCommand;
 
 class Kernel
 {
@@ -12,6 +13,7 @@ class Kernel
 
   private static array $commands = [
     ListCommand::class,
+    ServeCommand::class,
     InsultCommand::class,
   ];
 
