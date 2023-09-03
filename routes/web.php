@@ -1,5 +1,6 @@
 <?php
 
+use Controllers\HomeController;
 use Pigen\Modules\Routing\Route;
 use Pigen\Modules\ViewEngine\View;
 
@@ -14,4 +15,4 @@ use Pigen\Modules\ViewEngine\View;
  | 
 */
 
-Route::GET("/", ["abc"]);
+Route::GET("/", [HomeController::class, 'index']);

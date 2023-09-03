@@ -30,7 +30,13 @@ class Route
         self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']]
       )
     ) {
-      echo "Found registered route for " . $this->pathAttributes['path'] . " with method " . $this->pathAttributes['method'];
+      $handler = self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']];
+
+      $className = $handler[0];
+      $classMethod = $handler[1];
+
+      $class = new $className();
+      echo call_user_func([$class, $classMethod]);
     } else {
       echo '404. Not found';
     }

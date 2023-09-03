@@ -16,7 +16,7 @@ class View
     );
   }
 
-  public static function compile(string $filepath)
+  public static function compile(string $filepath, array $parameters)
   {
     $pathCompiled = ABSPATH . '/resources/views/' . $filepath . '.blade.php';
 
@@ -24,9 +24,6 @@ class View
       throw new PigenException("File '$filepath' does not exist");
     }
 
-    return static::$blade->make($filepath, [])->render();
+    return static::$blade->make($filepath, $parameters)->render();
   }
 }
-
-// Inital setup
-new View();

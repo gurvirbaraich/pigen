@@ -1,21 +1,22 @@
 {
-    "name": "baraich/src",
-    "description": "Barebones to the pigen framework.",
-    "type": "project",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Pigen\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Gurvir Singh"
-        }
-    ],
-    "require": {
-        "filp/whoops": "^2.15",
-        "symfony/var-dumper": "^6.3",
-        "jenssegers/blade": "^1.4"
+  "name": "baraich/src",
+  "description": "Barebones to the pigen framework.",
+  "type": "project",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Pigen\\": "src/",
+      "Controllers\\": "app/http/controllers/"
     }
+  },
+  "authors": [
+    {
+      "name": "Gurvir Singh"
+    }
+  ],
+  "require": {
+    "filp/whoops": "^2.15",
+    "symfony/var-dumper": "^6.3",
+    "jenssegers/blade": "^1.4"
+  }
 }
