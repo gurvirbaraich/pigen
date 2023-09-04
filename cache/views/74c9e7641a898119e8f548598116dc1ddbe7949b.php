@@ -1,1 +1,2 @@
+<?php $__env->startSection('title', 'Home'); ?>
 <?php echo $__env->make('layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Users/baraich/Desktop/pigen/framework/resources/views/index.blade.php ENDPATH**/ ?>

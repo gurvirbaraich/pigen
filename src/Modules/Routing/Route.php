@@ -36,17 +36,31 @@ class Route
       $className = $handler[0];
       $classMethod = $handler[1];
 
+      if (!class_exists($className)) {
+        throw new \Exception("Class {$className} does not exist.");
+      }
+
+      $parameters = [];
       $class = new $className();
-      echo call_user_func([$class, $classMethod]);
+
+      $parametersRequired = (new \ReflectionClass($class))
+        ->getMethod($classMethod)
+        ->getParameters();
+
+      foreach ($parametersRequired as $parameter) {
+        $parameterName = $parameter->getType()->getName();
+        $parameters[] = new $parameterName;
+      }
+
+      echo call_user_func([$class, $classMethod], ...$parameters);
     } else {
       // Check if assets are requested
-      echo ABSPATH . '/public' . $this->pathAttributes['path']; 
       if (
         is_file(
           ($filename = ABSPATH . '/public' . $this->pathAttributes['path'])
         )
       ) {
-        
+
         echo file_get_contents($filename);
         return;
       }

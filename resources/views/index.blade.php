@@ -1,1 +1,3 @@
-@include('layout')
+@extends('layout')
+
+@section('title', 'Home')

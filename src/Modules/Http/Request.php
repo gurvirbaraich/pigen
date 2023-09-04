@@ -75,6 +75,14 @@ class Request
   }
 
   /**
+   * @return array 
+   */
+  public function all(): array
+  {
+    return $this->parameters;
+  }
+
+  /**
    * Creates a new instance of the Request object
    */
   public static function capture()
