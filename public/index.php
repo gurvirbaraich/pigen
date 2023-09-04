@@ -18,7 +18,7 @@ use Pigen\Modules\Http\Request;
  |
  */
 
-require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 /*
  | ----------------------------------------------------------------
@@ -31,7 +31,7 @@ require __DIR__ . '/vendor/autoload.php';
  |
  */
 
-define("ABSPATH", __DIR__);
+define("ABSPATH", dirname(__DIR__));
 
 /*
  | --------------------------------------------------------------------

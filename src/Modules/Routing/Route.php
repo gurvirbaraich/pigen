@@ -39,7 +39,19 @@ class Route
       $class = new $className();
       echo call_user_func([$class, $classMethod]);
     } else {
-      echo '404. Not found';
+      // Check if assets are requested
+      echo ABSPATH . '/public' . $this->pathAttributes['path']; 
+      if (
+        is_file(
+          ($filename = ABSPATH . '/public' . $this->pathAttributes['path'])
+        )
+      ) {
+        
+        echo file_get_contents($filename);
+        return;
+      }
+
+      echo "404 Not Found!";
     }
   }
 

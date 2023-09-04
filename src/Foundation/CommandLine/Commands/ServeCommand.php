@@ -3,7 +3,6 @@
 namespace Pigen\Foundation\CommandLine\Commands;
 
 use Carbon\Carbon;
-use Pigen\Modules\Http\Request;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Terminal;
@@ -31,7 +30,7 @@ class ServeCommand extends Command
 
   protected function execute(InputInterface $input, OutputInterface $output): int
   {
-    $process = new Process($this->serveCommand(), ABSPATH);
+    $process = new Process($this->serveCommand(), ABSPATH . '/public');
 
     $process->start(
       fn ($_, $buffer) => $this->handleOutput($buffer, $output)
@@ -84,7 +83,7 @@ class ServeCommand extends Command
         $out = sprintf("%s <fg=". $this->colors[$request[1]] .">%s</> %s %s", $timestamp, $request[1], $request[2], $request[0]);
 
         $output->writeln(
-          sprintf("%s <fg=gray>%s</>", $out, str_repeat(".", $dots))
+          sprintf("%s <fg=gray>%s</>", $out, str_repeat(".", $dots < 0 ? 0 : $dots))
         );
       }
     }
