@@ -14,7 +14,7 @@ class Request
    *
    * @var array
    */
-  private array $parameters = [];
+  private static array $parameters = [];
 
   private array $properties = [];
 
@@ -49,7 +49,7 @@ class Request
   private function load($data)
   {
     foreach ($data as $key => $value) {
-      $this->parameters[$key] = $value;
+      self::$parameters[$key] = $value;
     }
   }
 
@@ -61,7 +61,7 @@ class Request
    */
   public function __get($name)
   {
-    return $this->parameters[$name] ?? $this->properties[$name];
+    return self::$parameters[$name] ?? $this->properties[$name];
   }
 
   /**
@@ -71,7 +71,7 @@ class Request
    */
   public function __set(string $name, $value): void
   {
-    $this->parameters[$name] = $value;
+    self::$parameters[$name] = $value;
   }
 
   /**
@@ -79,7 +79,7 @@ class Request
    */
   public function all(): array
   {
-    return $this->parameters;
+    return self::$parameters;
   }
 
   /**
@@ -88,5 +88,9 @@ class Request
   public static function capture()
   {
     return new self();
+  }
+
+  public static function append($name, $value) {
+    self::$parameters[$name] = $value;
   }
 }

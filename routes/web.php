@@ -2,7 +2,6 @@
 
 use Controllers\HomeController;
 use Pigen\Modules\Routing\Route;
-use Pigen\Modules\ViewEngine\View;
 
 /* 
  | ----------------------------------------------------------------
@@ -12,11 +11,9 @@ use Pigen\Modules\ViewEngine\View;
  | Here is where you can define web routes for your application. 
  | These routes are automatically loaded and are associated with
  | 'web' middlewar group.
- | 
+ |  
 */
 
 Route::GET("/", [HomeController::class, 'index']);
-Route::GET("/profile/:id", [HomeController::class, 'profile']);
-Route::GET("/subscriptions/:id", [HomeController::class, 'subscribe']);
-
-Route::POST("/account/login", [HomeController::class, 'login']);
+Route::GET("/post/:id", [HomeController::class, 'singlePost']);
+Route::GET("/posts/:id", [HomeController::class, 'singlePost']);

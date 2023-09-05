@@ -2,6 +2,8 @@
 
 namespace Pigen\Modules\Routing;
 
+use Pigen\Modules\Http\Request;
+
 class Route
 {
   /**
@@ -31,29 +33,18 @@ class Route
         self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']]
       )
     ) {
-      $handler = self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']];
-
-      $className = $handler[0];
-      $classMethod = $handler[1];
-
-      if (!class_exists($className)) {
-        throw new \Exception("Class {$className} does not exist.");
-      }
-
-      $parameters = [];
-      $class = new $className();
-
-      $parametersRequired = (new \ReflectionClass($class))
-        ->getMethod($classMethod)
-        ->getParameters();
-
-      foreach ($parametersRequired as $parameter) {
-        $parameterName = $parameter->getType()->getName();
-        $parameters[] = new $parameterName;
-      }
-
-      echo call_user_func([$class, $classMethod], ...$parameters);
+      echo $this->invokeHandler(
+        self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']]
+      );
     } else {
+      $resposne = $this->lookForVariableRoutes();
+
+      if ($resposne) {
+        echo $resposne;
+        return;
+      }
+      
+
       // Check if assets are requested
       if (
         is_file(
@@ -67,6 +58,63 @@ class Route
 
       echo "404 Not Found!";
     }
+  }
+
+  private function lookForVariableRoutes()
+  {
+    $variablePaths = $this->getVariableRoutes();
+
+    foreach ($variablePaths as $vpath) {
+      $pathRegex = '/' . preg_quote($vpath->static_path, "/") . '/m';
+      preg_match_all($pathRegex, $this->pathAttributes['path'], $matches, PREG_SET_ORDER, 0);
+
+      if (count($matches) > 0) {
+        $pathVariableExtractionRegex = '/' . preg_quote($vpath->static_path, "/") . '(\w+)/m';
+        $variableValue = preg_replace($pathVariableExtractionRegex, "$1", $this->pathAttributes['path']);
+
+        if ($variableValue != $this->pathAttributes['path']) {
+          Request::append($vpath->variable_path, $variableValue);
+
+          $this->invokeHandler(
+            self::$paths[$this->pathAttributes['method']][$vpath->path]
+          );
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private function invokeHandler($handler)
+  {
+    $className = $handler[0];
+    $classMethod = $handler[1];
+
+    if (!class_exists($className)) {
+      throw new \Exception("Class {$className} does not exist.");
+    }
+
+    $class = new $className;
+    $parameters = $this->getParametersFor($class, $classMethod);
+
+    $class->$classMethod(...$parameters);
+  }
+
+  private function getParametersFor($className, $classMethod)
+  {
+    $parameters = [];
+    $class = new $className();
+
+    $parametersRequired = (new \ReflectionClass($class))
+      ->getMethod($classMethod)
+      ->getParameters();
+
+    foreach ($parametersRequired as $parameter) {
+      $parameterName = $parameter->getType()->getName();
+      $parameters[] = new $parameterName;
+    }
+
+    return $parameters;
   }
 
   /**
@@ -152,6 +200,30 @@ class Route
   private static function append(string $method, string $path, array $handlers)
   {
     self::$paths[$method][$path] = $handlers;
+  }
+
+  private function getVariableRoutes()
+  {
+    $variablePaths = [];
+
+    foreach (self::$paths[$this->pathAttributes['method']] as $key => $_) {
+      $checkRegex = '/(.*\/):(.*)/m';
+      preg_match_all($checkRegex, $key, $matches, PREG_SET_ORDER, 0);
+
+      if (count($matches) > 0) {
+        $variablePaths[] = json_decode(
+          json_encode(
+            [
+              'path' => $matches[0][0],
+              'static_path' => $matches[0][1],
+              'variable_path' => $matches[0][2]
+            ]
+          )
+        );
+      }
+    }
+
+    return $variablePaths;
   }
 
   /**
