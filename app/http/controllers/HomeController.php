@@ -13,8 +13,6 @@ class HomeController extends Controller
   }
 
   public function singlePost(Request $request) {
-    return $this->render('single-post', [
-      'postId' => $request->id
-    ]);
+    dd($request->all());
   }
 }

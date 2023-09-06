@@ -15,5 +15,7 @@ use Pigen\Modules\Routing\Route;
 */
 
 Route::GET("/", [HomeController::class, 'index']);
-Route::GET("/post/:id", [HomeController::class, 'singlePost']);
 Route::GET("/posts/:id", [HomeController::class, 'singlePost']);
+
+Route::GET("/posts/comments/:id", [HomeController::class, 'singlePost']);
+Route::GET("/posts/reply/:postid/:commentId", [HomeController::class, 'singlePost']);
