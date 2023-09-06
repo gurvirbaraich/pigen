@@ -11,14 +11,4 @@ class Controller extends View
     parent::__construct();
   }
 
-  protected function render(string $filepath, array $parameters = [])
-  {
-    $pathCompiled = ABSPATH . '/resources/views/' . $filepath . '.blade.php';
-
-    if (!file_exists($pathCompiled)) {
-      throw new PigenException("File '$filepath' does not exist");
-    }
-
-    echo $this->blade->render($filepath, $parameters);
-  }
 }

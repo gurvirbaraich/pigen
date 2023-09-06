@@ -37,9 +37,7 @@ class Route
         self::$paths[$this->pathAttributes['method']][$this->pathAttributes['path']]
       );
     } else {
-      $resposne = $this->lookForVariableRoutes();
-
-      if ($resposne) {
+      if (($resposne = $this->lookForVariableRoutes())) {
         echo $resposne;
         return;
       }
@@ -75,7 +73,7 @@ class Route
         if ($variableValue != $this->pathAttributes['path']) {
           Request::append($vpath->variable_path, $variableValue);
 
-          $this->invokeHandler(
+          return $this->invokeHandler(
             self::$paths[$this->pathAttributes['method']][$vpath->path]
           );
         }
@@ -97,7 +95,12 @@ class Route
     $class = new $className;
     $parameters = $this->getParametersFor($class, $classMethod);
 
-    $class->$classMethod(...$parameters);
+    return (
+      call_user_func(
+        [$class, $classMethod],
+        ...$parameters
+      )
+    );
   }
 
   private function getParametersFor($className, $classMethod)

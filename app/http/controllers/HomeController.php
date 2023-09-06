@@ -9,11 +9,11 @@ class HomeController extends Controller
 {
   public function index()
   {
-    $this->render('index', []);
+    return $this->render('index', []);
   }
 
   public function singlePost(Request $request) {
-    $this->render('single-post', [
+    return $this->render('single-post', [
       'postId' => $request->id
     ]);
   }
