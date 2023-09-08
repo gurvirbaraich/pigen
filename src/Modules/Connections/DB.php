@@ -6,19 +6,12 @@ use Pigen\Foundation\Connections\Database;
 
 class DB
 {
-  private static $instance = null;
+  private static Database | null $instance = null;
 
   private static function getInstance()
   {
     if (self::$instance == null) {
-      
-
-      $options = array(
-        \PDO::MYSQL_ATTR_SSL_CA => "/etc/ssl/cert.pem",
-      );
-
-      $pdo = new \PDO($dsn, $username, $password, $options);
-      self::$instance = new Database($pdo);
+      self::$instance = new Database();
     }
     return self::$instance;
   }

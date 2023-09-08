@@ -2,6 +2,8 @@
 
 use Pigen\Modules\Http\Kernel;
 
+require_once ABSPATH . '/src/core/helpers.php';
+
 /**
  * Acts as a foundation for the various modules that work 
  * in sync with the application
@@ -26,6 +28,9 @@ class Application
   {
     $this->workers['http'] = new Kernel();
     $this->workers['error'] = new \Pigen\Foundation\Error\Handler();
+
+    $dotenv = Dotenv\Dotenv::createImmutable(ABSPATH);
+    $dotenv->load();
   }
 }
 

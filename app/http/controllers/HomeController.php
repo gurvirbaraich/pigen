@@ -11,10 +11,7 @@ class HomeController extends Controller
   public function index()
   {
     dd(
-      DB::table('users')
-        ->fields(['name'])
-          ->where('id', '>', 0)
-            ->GET()
+      DB::table('users')->get()
     );
     return $this->render('index', []);
   }

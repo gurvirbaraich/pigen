@@ -2,35 +2,19 @@
 
 namespace Pigen\Foundation\Connections;
 
-use PDO;
-use Pigen\Modules\Exception\PigenException;
+use Pigen\Foundation\Database\SQL;
+use Pigen\Foundation\Database\PDO\Connection;
 
-class Database
+class Database extends Connection
 {
-  private array $types = [
-    'AND',
-    'OR'
-  ];
-
-  private array $opreators = [
-    '=',       //	Equal to
-    '>',       // Greater Than
-    '<>',      //	Not Equal to
-    'LIKE',    //	Search for a pattern
-    'BETWEEN', //	In an inclusive Range
-    'IN',      //	To specify multiple possible values for a column
-  ];
-
-  protected PDO $pdo;
-
   protected string $table;
-  protected string $columns = '*';
+  protected array $columns = array('*');
 
-  protected array $wheres = [];
+  protected array $wheres = array();
 
-  public function __construct(PDO $pdo)
+  public function __construct()
   {
-    $this->pdo = $pdo;
+    parent::__construct();
   }
 
   public function table(string $table)
@@ -41,23 +25,23 @@ class Database
 
   public function fields(array $fields)
   {
-    $this->columns = join(",", $fields);
+    $this->columns = $fields;
+
     return $this;
   }
 
-  public function where(string $column, string $opreator, string $value)
+  public function where(string $column, string $value)
   {
-    if (
-      !(in_array($opreator, $this->opreators))
-    ) {
-      throw new PigenException("Unsupported opreator: " . $opreator);
-    }
+    return $this->handleWhere($column, Connection::EQUALS, $value);
+  }
 
+  private function handleWhere(string $column, string $opreator, string $value)
+  {
     $this->wheres[] = [
-      'type' => 'AND',
       'value' => $value,
       'column' => $column,
       'opreator' => $opreator,
+      'type' => Connection::AND,
     ];
 
     return $this;
@@ -65,31 +49,18 @@ class Database
 
   public function get()
   {
-    $sql = $this->finalizeSQL();
-    $stmt = $this->pdo->prepare($sql);
+    $sql = SQL::selectSQL(
+      $this->table,
+      $this->columns,
+      $this->wheres
+    );
 
-    $bindedValues = array_column($this->wheres, 'value');
-    $stmt->execute($bindedValues);
-
-    return $stmt->fetchAll(PDO::FETCH_OBJ);
-  }
-
-  private function finalizeSQL()
-  {
-    $sql = 'SELECT ' . $this->columns . ' FROM ' . $this->table;
-
-    if (!empty($this->wheres)) {
-      $sql .= ' WHERE ';
-
-      foreach ($this->wheres as $index => $where) {
-        if ($index > 0) {
-          $sql .= $where['type'] . ' ';
-        }
-
-        $sql .= $where['column'] . ' ' . $where['opreator'] . ' ?';
-      }
-    }
-
-    return $sql;
+    return $this->execute(
+      $sql,
+      array_column(
+        $this->wheres,
+        'value'
+      )
+    );
   }
 }
