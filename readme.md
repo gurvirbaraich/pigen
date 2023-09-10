@@ -1,5 +1,10 @@
 # Pigen
-**TODO:** Update readme.md
+## Features
+- Routing system with wildcard routes.
+- Integration of blade template engine.
+- Dependancy Injection Supported.
+- Integration of Symfony Console.
+- Custom Commands for Pigen.
 
 ## Code of Conduct
 
