@@ -2,7 +2,10 @@
 
 namespace Pigen\Modules\Routing;
 
+use Exception;
+use Pigen\Modules\Exception\PigenException;
 use Pigen\Modules\Http\Request;
+use ReflectionException;
 use stdClass;
 
 /**
@@ -40,20 +43,22 @@ class Route
 
   /**
    * Destructor to handle the route processing.
+   * @throws Exception
    */
   public function __destruct()
   {
     $this->handleRoute();
   }
 
-  /**
-   * Handles the route processing.
-   *
-   * This method checks if the requested route matches a registered route and
-   * invokes the associated handlers. If no match is found, it returns a 404
-   * Not Found response.
-   */
-  private function handleRoute()
+    /**
+     * Handles the route processing.
+     *
+     * This method checks if the requested route matches a registered route and
+     * invokes the associated handlers. If no match is found, it returns a 404
+     * Not Found response.
+     * @throws Exception
+     */
+  private function handleRoute(): void
   {
     $handler = $this->findRouteHandler();
 
@@ -78,7 +83,7 @@ class Route
    *
    * @return array|null An array containing the handler if a match is found, or null if not.
    */
-  private function findRouteHandler()
+  private function findRouteHandler(): ?array
   {
     $method = $this->pathAttributes['method'];
     $path = $this->pathAttributes['path'];
@@ -109,7 +114,7 @@ class Route
    * @param string $path The requested path.
    * @return bool True if the route matches with parameters, false otherwise.
    */
-  private function matchRouteWithParameters($route, $path)
+  private function matchRouteWithParameters(string $route, string $path): bool
   {
     $routeParts = explode('/', $route);
     $pathParts = explode('/', $path);
@@ -119,7 +124,7 @@ class Route
     }
 
     for ($i = 0; $i < count($routeParts); $i++) {
-      if ($routeParts[$i] != $pathParts[$i] && strpos($routeParts[$i], ':') !== false) {
+      if ($routeParts[$i] != $pathParts[$i] && str_contains($routeParts[$i], ':')) {
         // Parameter found in route, e.g., ":id"
         $paramName = ltrim($routeParts[$i], ':');
         Request::append($paramName, $pathParts[$i]);
@@ -139,13 +144,14 @@ class Route
    * attempts to match them with the current request path.
    *
    * @return mixed|null
+   * @throws PigenException
    */
-  private function lookForVariableRoutes()
+  private function lookForVariableRoutes(): mixed
   {
     $variablePaths = $this->getVariableRoutes();
 
-    foreach ($variablePaths as $vpath) {
-      $this->getDeepRoute($vpath);
+    foreach ($variablePaths as $variablePath) {
+      $this->getDeepRoute($variablePath);
     }
 
     return null;
@@ -156,39 +162,43 @@ class Route
    *
    * This method is a placeholder for handling routes with variable parts.
    *
-   * @param $vpath
+   * @param $variablePath
+   * @throws PigenException
    */
-  private function getDeepRoute($vpath)
+  private function getDeepRoute($variablePath): void
   {
-    if (!($vpath->static_path instanceof stdClass)) {
-      $this->getVariableRouteOutput($vpath);
+    if (!($variablePath->static_path instanceof stdClass)) {
+      try {
+        $this->getVariableRouteOutput($variablePath);
+      } catch (Exception $e) {
+        throw new PigenException($e->getMessage());
+      }
     }
-
-    // Not finished implementation
   }
 
-  /**
-   * Handle variable route output.
-   *
-   * This method extracts values from variable parts of the route and adds them to
-   * the request object. If a match is found, it invokes the associated handlers.
-   *
-   * @param $vpath
-   */
-  private function getVariableRouteOutput($vpath)
+    /**
+     * Handle variable route output.
+     *
+     * This method extracts values from variable parts of the route and adds them to
+     * the request object. If a match is found, it invokes the associated handlers.
+     *
+     * @param $variablePath
+     * @throws Exception
+     */
+  private function getVariableRouteOutput($variablePath): void
   {
-    $pathRegex = '/' . preg_quote($vpath->static_path, "/") . '/m';
+    $pathRegex = '/' . preg_quote($variablePath->static_path, "/") . '/m';
     preg_match_all($pathRegex, $this->pathAttributes['path'], $matches, PREG_SET_ORDER, 0);
 
     if (count($matches) > 0) {
-      $pathVariableExtractionRegex = '/' . preg_quote($vpath->static_path, "/") . '(\w+)/m';
+      $pathVariableExtractionRegex = '/' . preg_quote($variablePath->static_path, "/") . '(\w+)/m';
       $variableValue = preg_replace($pathVariableExtractionRegex, "$1", $this->pathAttributes['path']);
 
       if ($variableValue != $this->pathAttributes['path']) {
-        Request::append($vpath->variable_path, $variableValue);
+        Request::append($variablePath->variable_path, $variableValue);
 
-        if (isset(self::$paths[$this->pathAttributes['method']][$vpath->path])) {
-          return $this->invokeHandler(self::$paths[$this->pathAttributes['method']][$vpath->path]);
+        if (isset(self::$paths[$this->pathAttributes['method']][$variablePath->path])) {
+            $this->invokeHandler(self::$paths[$this->pathAttributes['method']][$variablePath->path]);
         }
       }
     }
@@ -202,15 +212,15 @@ class Route
    *
    * @param $handler
    * @return mixed
-   * @throws \Exception
+   * @throws Exception
    */
-  private function invokeHandler($handler)
+  private function invokeHandler($handler): mixed
   {
     $className = $handler[0];
     $classMethod = $handler[1];
 
     if (!class_exists($className)) {
-      throw new \Exception("Class {$className} does not exist.");
+      throw new Exception("Class {$className} does not exist.");
     }
 
     $class = new $className();
@@ -219,17 +229,18 @@ class Route
     return call_user_func([$class, $classMethod], ...$parameters);
   }
 
-  /**
-   * Get parameters required for a route handler.
-   *
-   * This method retrieves parameters required for a route handler and instantiates
-   * objects to be passed as parameters.
-   *
-   * @param $className
-   * @param $classMethod
-   * @return array
-   */
-  private function getParametersFor($className, $classMethod)
+    /**
+     * Get parameters required for a route handler.
+     *
+     * This method retrieves parameters required for a route handler and instantiates
+     * objects to be passed as parameters.
+     *
+     * @param $className
+     * @param $classMethod
+     * @return array
+     * @throws ReflectionException
+     */
+  private function getParametersFor($className, $classMethod): array
   {
     $parameters = [];
     $class = new $className();
@@ -255,7 +266,7 @@ class Route
    *
    * @return array An array of variable route objects.
    */
-  private function getVariableRoutes()
+  private function getVariableRoutes(): array
   {
     $variablePaths = [];
 
@@ -278,7 +289,7 @@ class Route
    * @param string $path The route path to check for wildcards.
    * @return object|null An object representing the wildcard parameters or null if none are found.
    */
-  private function checkForWildcard(string $path)
+  private function checkForWildcard(string $path): ?object
   {
     $checkRegex = '/(.*\/):(\w+).*$/m';
     preg_match_all($checkRegex, $path, $matches, PREG_SET_ORDER, 0);
@@ -288,13 +299,11 @@ class Route
         $matches[0][1] = $isWildcard;
       }
 
-      $variablePath = json_decode(json_encode([
-        'path' => $matches[0][0],
-        'static_path' => $matches[0][1],
-        'variable_path' => $matches[0][2]
-      ]));
-
-      return $variablePath;
+        return json_decode(json_encode([
+          'path' => $matches[0][0],
+          'static_path' => $matches[0][1],
+          'variable_path' => $matches[0][2]
+        ]));
     }
 
     return null;
@@ -307,7 +316,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  public static function GET(string $path, array $handlers)
+  public static function GET(string $path, array $handlers): void
   {
     self::append("GET", $path, $handlers);
   }
@@ -318,7 +327,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  public static function PUT(string $path, array $handlers)
+  public static function PUT(string $path, array $handlers): void
   {
     self::append("PUT", $path, $handlers);
   }
@@ -329,7 +338,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  public static function POST(string $path, array $handlers)
+  public static function POST(string $path, array $handlers): void
   {
     self::append("POST", $path, $handlers);
   }
@@ -340,7 +349,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  public static function PATCH(string $path, array $handlers)
+  public static function PATCH(string $path, array $handlers): void
   {
     self::append("PATCH", $path, $handlers);
   }
@@ -351,7 +360,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  public static function DELETE(string $path, array $handlers)
+  public static function DELETE(string $path, array $handlers): void
   {
     self::append("DELETE", $path, $handlers);
   }
@@ -362,7 +371,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  public static function OPTIONS(string $path, array $handlers)
+  public static function OPTIONS(string $path, array $handlers): void
   {
     self::append("OPTIONS", $path, $handlers);
   }
@@ -374,7 +383,7 @@ class Route
    * @param string $path The path for the route.
    * @param array $handlers An array of handlers to be executed when the route is matched.
    */
-  private static function append(string $method, string $path, array $handlers)
+  private static function append(string $method, string $path, array $handlers): void
   {
     self::$paths[$method][$path] = $handlers;
   }
@@ -383,9 +392,14 @@ class Route
    * Create a new instance of the Route class.
    *
    * @param array $pathAttributes An array containing route attributes (method and path).
+   * @throws PigenException
    */
-  public static function ignite(array $pathAttributes)
+  public static function ignite(array $pathAttributes): ?Route
   {
-    new self($pathAttributes);
+    if (empty($pathAttributes)) {
+      throw new PigenException("Path Attributes must be an array.");
+    }
+
+    return new self($pathAttributes);
   }
 }
