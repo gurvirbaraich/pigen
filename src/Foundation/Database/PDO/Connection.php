@@ -8,10 +8,6 @@ use stdClass;
 
 class Connection
 {
-  const OR = 'OR';
-  const AND = 'AND';
-  const EQUALS = '=';
-  const FIELDS_SEPERATOR = ',';
 
   protected PDO $connection;
   private stdClass $environment;
@@ -34,7 +30,7 @@ class Connection
     $this->connect();
   }
 
-  private function connect()
+  private function connect(): void
   {
     $this->connection = new PDO(
       concatenate(
@@ -50,12 +46,15 @@ class Connection
     );
   }
 
-  protected function prepare($sql)
+  protected function prepare($sql): bool|\PDOStatement
   {
     return $this->connection->prepare($sql);
   }
 
-  protected function execute($sql, $values)
+  /**
+   * @throws PigenException
+   */
+  protected function execute($sql, $values): bool|array
   {
     $stmt = $this->prepare($sql);
 

@@ -18,6 +18,9 @@ class View
     );
   }
 
+  /**
+   * @throws PigenException
+   */
   public function render(string $filepath, array $parameters = [])
   {
     $pathCompiled = ABSPATH . '/resources/views/' . $filepath . '.blade.php';

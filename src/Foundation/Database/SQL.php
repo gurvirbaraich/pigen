@@ -1,13 +1,18 @@
 <?php
 namespace Pigen\Foundation\Database;
 
-use Pigen\Foundation\Database\PDO\Connection;
 
 class SQL
 {
-  public static function selectSQL($table, $columns, $where)
+  const OR = 'OR';
+  const AND = 'AND';
+  const EQUALS = '=';
+  const FIELDS_SEPARATOR = ',';
+
+
+  public static function selectSQL($table, $columns, $where): string
   {
-    $columns = join(Connection::FIELDS_SEPERATOR, $columns);
+    $columns = join(SQL::FIELDS_SEPARATOR, $columns);
     $sql = 'SELECT ' . $columns . ' FROM ' . $table;
 
     if (!empty($wheres)) {

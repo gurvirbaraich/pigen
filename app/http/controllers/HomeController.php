@@ -2,18 +2,18 @@
 
 namespace Controllers;
 
-use Pigen\Modules\Connections\DB;
+use Models\User;
 use Pigen\Modules\Http\Request;
 use Pigen\Modules\ViewEngine\Controller;
 
+
 class HomeController extends Controller
 {
-  public function index()
+  public function index(): string
   {
-    dd(
-      DB::table('users')->get()
-    );
-    return $this->render('index', []);
+    return $this->render('table', array(
+      'data' => User::get()
+    ));
   }
 
   public function singlePost(Request $request)
